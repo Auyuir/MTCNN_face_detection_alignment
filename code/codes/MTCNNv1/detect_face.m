@@ -10,14 +10,14 @@ function [total_boxes points] = detect_face(img,minsize,PNet,RNet,ONet,threshold
 	h=size(img,1);
 	w=size(img,2);
 	minl=min([w h]);
-    img=single(img);
+	img=single(img);
 	if fastresize
 		im_data=(single(img)-127.5)*0.0078125;
-    end
-    m=12/minsize;
+	end
+	m=12/minsize;
 	minl=minl*m;
 	%creat scale pyramid
-    scales=[];
+	scales=[];
 	while (minl>=12)
 		scales=[scales m*factor^(factor_count)];
 		minl=minl*factor;
@@ -114,5 +114,5 @@ function [total_boxes points] = detect_face(img,minsize,PNet,RNet,ONet,threshold
                 points(6:10,:)=repmat(h',[5 1]).*points(6:10,:)+repmat(total_boxes_tmp(pick,2)',[5 1])-1;     
 			end
 		end
-    end 	
+	end 	
 end

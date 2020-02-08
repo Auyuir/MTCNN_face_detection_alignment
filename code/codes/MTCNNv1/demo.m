@@ -35,15 +35,15 @@ model_dir = strcat(caffe_model_path,'/det3.caffemodel');
 ONet=caffe.Net(prototxt_dir,model_dir,'test');
 faces=cell(0);	
 for i=1:length(imglist)
-    i
+	i
 	img=imread(imglist{i});
 	%we recommend you to set minsize as x * short side
 	%minl=min([size(img,1) size(img,2)]);
 	%minsize=fix(minl*0.1)
-    tic
-    [boudingboxes points]=detect_face(img,minsize,PNet,RNet,ONet,threshold,false,factor);
+	tic
+	[boudingboxes points]=detect_face(img,minsize,PNet,RNet,ONet,threshold,false,factor);
 	toc
-    faces{i,1}={boudingboxes};
+	faces{i,1}={boudingboxes};
 	faces{i,2}={points'};
 	%show detection result
 	numbox=size(boudingboxes,1);
@@ -52,8 +52,8 @@ for i=1:length(imglist)
 	for j=1:numbox
 		plot(points(1:5,j),points(6:10,j),'g.','MarkerSize',10);
 		r=rectangle('Position',[boudingboxes(j,1:2) boudingboxes(j,3:4)-boudingboxes(j,1:2)],'Edgecolor','g','LineWidth',3);
-    end
-    hold off; 
+	end
+	hold off; 
 	pause
 end
 save result box landmark
