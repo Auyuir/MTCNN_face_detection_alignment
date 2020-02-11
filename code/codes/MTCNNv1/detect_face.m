@@ -63,7 +63,7 @@ function [total_boxes points] = detect_face(img,minsize,PNet,RNet,ONet,threshold
 			tmp(dy(k):edy(k),dx(k):edx(k),:)=img(y(k):ey(k),x(k):ex(k),:);
 			tempimg(:,:,:,k)=imResample(tmp,[24 24],'bilinear');
 		end
-        tempimg=(tempimg-127.5)*0.0078125;
+		tempimg=(tempimg-127.5)*0.0078125;
 		RNet.blobs('data').reshape([24 24 3 numbox]);
 		out=RNet.forward({tempimg});
 		score=squeeze(out{2}(2,:));
@@ -72,16 +72,16 @@ function [total_boxes points] = detect_face(img,minsize,PNet,RNet,ONet,threshold
 		mv=out{1}(:,pass);
 		if size(total_boxes,1)>0		
 			pick=nms(total_boxes,0.7,'Union');
-			total_boxes=total_boxes(pick,:);     
-            total_boxes=bbreg(total_boxes,mv(:,pick)');	
-            total_boxes=rerec(total_boxes);
+			total_boxes=total_boxes(pick,:);	 
+			total_boxes=bbreg(total_boxes,mv(:,pick)');	
+			total_boxes=rerec(total_boxes);
 		end
 		numbox=size(total_boxes,1);
 		if numbox>0
 			%third stage
 			total_boxes=fix(total_boxes);
 			[dy edy dx edx y ey x ex tmpw tmph]=pad(total_boxes,w,h);
-            tempimg=zeros(48,48,3,numbox);
+			tempimg=zeros(48,48,3,numbox);
 			for k=1:numbox
 				tmp=zeros(tmph(k),tmpw(k),3);
 				tmp(dy(k):edy(k),dx(k):edx(k),:)=img(y(k):ey(k),x(k):ex(k),:);
@@ -94,24 +94,24 @@ function [total_boxes points] = detect_face(img,minsize,PNet,RNet,ONet,threshold
 			points=out{2};
 			pass=find(score>threshold(3));
 			total_boxes=[total_boxes(pass,1:4) score(pass)'];
-			mv=out{1}(:,pass);         
-            total_boxes_tmp=total_boxes;
+			mv=out{1}(:,pass);		 
+			total_boxes_tmp=total_boxes;
 			if size(total_boxes,1)>0	
 				total_boxes=bbreg(total_boxes,mv(:,:)');	
-                pick=nms(total_boxes,0.7,'Min');
+				pick=nms(total_boxes,0.7,'Min');
 				total_boxes=total_boxes(pick,:);  
-                
-                points1=points(:,pass(pick));
-                ONet.blobs('data').reshape([48 48 3 length(pass(pick))]);
-                tempimg=tempimg(:,end:-1:1,:,pass(pick));
-                out=ONet.forward({tempimg});
-                points=out{2};            
-                points2=[1-points([2,1,3,5,4],:);points([7,6,8,10,9],:)];
-                points=(points1+points2)/2;
-                w=total_boxes_tmp(pick,3)-total_boxes_tmp(pick,1)+1;
-                h=total_boxes_tmp(pick,4)-total_boxes_tmp(pick,2)+1;
-                points(1:5,:)=repmat(w',[5 1]).*points(1:5,:)+repmat(total_boxes_tmp(pick,1)',[5 1])-1;
-                points(6:10,:)=repmat(h',[5 1]).*points(6:10,:)+repmat(total_boxes_tmp(pick,2)',[5 1])-1;     
+				
+				points1=points(:,pass(pick));
+				ONet.blobs('data').reshape([48 48 3 length(pass(pick))]);
+				tempimg=tempimg(:,end:-1:1,:,pass(pick));
+				out=ONet.forward({tempimg});
+				points=out{2};			
+				points2=[1-points([2,1,3,5,4],:);points([7,6,8,10,9],:)];
+				points=(points1+points2)/2;
+				w=total_boxes_tmp(pick,3)-total_boxes_tmp(pick,1)+1;
+				h=total_boxes_tmp(pick,4)-total_boxes_tmp(pick,2)+1;
+				points(1:5,:)=repmat(w',[5 1]).*points(1:5,:)+repmat(total_boxes_tmp(pick,1)',[5 1])-1;
+				points(6:10,:)=repmat(h',[5 1]).*points(6:10,:)+repmat(total_boxes_tmp(pick,2)',[5 1])-1;
 			end
 		end
 	end 	
